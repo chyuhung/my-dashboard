@@ -17,7 +17,11 @@ func main() {
 		IdentityEndpoint: config.AuthURL,
 		Username:         config.Username,
 		Password:         config.Password,
-		TenantID:         config.ProjectID,
+		DomainName:       config.DomainName,
+		AllowReauth:      true,
+		Scope: &gophercloud.AuthScope{
+			ProjectName: config.ProjectName,
+			DomainName:  config.DomainName},
 	}
 
 	provider, err := openstack.AuthenticatedClient(authOpts)
