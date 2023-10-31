@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 
+	"github.com/chyuhung/my-dashboard/services"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/spf13/viper"
@@ -44,14 +45,17 @@ func Init() {
 		return
 	}
 
+	// computeClient
 	computeClient, err := openstack.NewComputeV2(provider, gophercloud.EndpointOpts{
 		Region: Region,
 		Name:   "nova",
 		Type:   "compute",
 	})
 	if err != nil {
-		// 错误处理
+		log.Println("Failed to create compute service client:", err)
+		return
 	}
 
 	// 将computeClient传递给需要使用的服务函数
+	services.SetComputeClient(computeClient)
 }

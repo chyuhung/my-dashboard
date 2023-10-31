@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/chyuhung/my-dashboard/controllers"
 	"github.com/gin-gonic/gin"
 )
 
