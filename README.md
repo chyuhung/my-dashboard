@@ -1,87 +1,47 @@
-# my-dashboard
+# 项目名称
 
-## 项目结构说明
+my-dashboard
 
-```stylus
-my-dashboard/
-├── api/
-│   ├── client.go
-│   ├── flavors.go
-│   ├── images.go
-│   ├── instances.go
-│   └── volumes.go
-├── handlers/
-│   ├── flavors_handler.go
-│   ├── images_handler.go
-│   ├── instances_handler.go
-│   └── volumes_handler.go
-├── models/
-│   ├── flavor.go
-│   ├── image.go
-│   ├── instance.go
-│   └── volume.go
-├── templates/
-│   ├── flavors.html
-│   ├── images.html
-│   ├── instances.html
-│   └── volumes.html
-├── main.go
-├── config.go
-└── README.md
-```
-api/ 目录包含与OpenStack API交互的逻辑，例如创建Gophercloud客户端和调用各种API的方法。
+# 项目简介
 
-handlers/ 目录包含用于处理HTTP请求的处理程序，从api包获取数据并将其渲染到模板中。
+my-dashboard 是一个使用 Gophercloud 实现类似 OpenStack Dashboard 的功能的仪表板应用。它提供了对 OpenStack 云环境的资源管理和操作。
 
-models/ 目录包含表示OpenStack资源（如flavor、image、instance、volume）的模型结构。
+# 功能特性
 
-templates/ 目录包含HTML模板文件，用于渲染不同的页面和资源。
+- 用户认证与授权
+- 虚拟机实例的管理（创建、启动、停止、删除等）
+- 虚拟机实例的监控信息展示
+- 网络和存储资源的管理
+...
+# 技术栈
 
-main.go 是项目的入口文件，用于初始化路由和服务器的设置。
+- Golang
+- Gin
+- Gophercloud
+- Vue
+...
 
-config.go 包含项目的配置信息，例如OpenStack认证参数和其他相关配置。
+# 快速开始
+## 后端
 
-README.md 是项目的说明文档，可以包含有关项目的详细信息和使用说明。
+克隆仓库：git clone https://github.com/your-username/my-dashboard.git
 
-## 项目运行
+进入后端目录：cd my-dashboard/backend
 
-### 安装依赖
+安装依赖：go mod download
 
-```bash
-go get github.com/gophercloud/gophercloud
-```
-### 运行项目
+修改配置：在 config/config.go 文件中填入正确的 OpenStack 认证信息和其他配置项
 
-```bash
-go run main.go
-```
-## 项目说明
+启动后端服务：go run main.go
 
-### 项目功能
+## 前端
 
-本项目主要实现OpenStack Dashboard的flavors、images、instances、volumes功能。
+克隆仓库：git clone https://github.com/your-username/my-dashboard.git
 
-## 开发计划
-1. 配置OpenStack认证参数：
-   - 在`config.go`文件中定义和读取OpenStack认证参数，如用户名、密码、项目ID等。
+进入前端目录：cd my-dashboard/frontend
 
-2. 创建Gophercloud客户端：
-   - 在`api/client.go`文件中创建Gophercloud的认证客户端，使用上一步中的认证参数。
+安装依赖：npm install
 
-3. 实现API调用和数据模型：
-   - 在`api/flavors.go`、`api/images.go`、`api/instances.go`、`api/volumes.go`等文件中，使用Gophercloud客户端调用相应的OpenStack API，并将响应数据转换为模型结构（如`models/flavor.go`、`models/image.go`、`models/instance.go`、`models/volume.go`）。
+修改配置：在 .env.development 文件中填入正确的后端服务地址
 
-4. 实现页面处理程序：
-   - 在`handlers/flavors_handler.go`、`handlers/images_handler.go`、`handlers/instances_handler.go`、`handlers/volumes_handler.go`等文件中，实现处理HTTP请求的处理程序。这些处理程序应该从API调用中获取数据，并将其渲染到对应的HTML模板中。
-
-5. 编写HTML模板：
-   - 在`templates/flavors.html`、`templates/images.html`、`templates/instances.html`、`templates/volumes.html`等文件中，编写HTML模板，定义页面的结构和展示数据的方式。使用Go的模板语法和相应的模板渲染引擎（如`html/template`包）来渲染模板并生成最终的HTML响应。
-
-6. 设置路由和服务器：
-   - 在`main.go`文件中，使用适当的路由框架（如`gorilla/mux`）设置路由规则，并启动HTTP服务器。在路由处理程序中，将请求分发给相应的处理程序。
-
-7. 测试和调试：
-   - 在开发过程中，使用适当的测试框架（如`testing`包）编写单元测试，并进行测试和调试，确保每个模块和功能正常工作。
-
-8. 部署和发布：
-   - 将完成的代码部署到适当的服务器环境，并进行测试和部署验证。确保服务器环境中已正确设置OpenStack认证参数，并与OpenStack API进行连接。
+启动前端服务：npm run serve
