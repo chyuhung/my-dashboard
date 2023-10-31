@@ -24,7 +24,7 @@ my-dashboard 是一个使用 Gophercloud 实现类似 OpenStack Dashboard 的功
 # 快速开始
 ## 后端
 
-克隆仓库：git clone https://github.com/your-username/my-dashboard.git
+克隆仓库：git clone https://github.com/chyuhung/my-dashboard.git
 
 进入后端目录：cd my-dashboard/backend
 
@@ -36,7 +36,7 @@ my-dashboard 是一个使用 Gophercloud 实现类似 OpenStack Dashboard 的功
 
 ## 前端
 
-克隆仓库：git clone https://github.com/your-username/my-dashboard.git
+克隆仓库：git clone https://github.com/chyuhung/my-dashboard.git
 
 进入前端目录：cd my-dashboard/frontend
 
