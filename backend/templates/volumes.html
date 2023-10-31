@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>OpenStack Volumes</title>
+</head>
+<body>
+    <h1>OpenStack Volumes</h1>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Size (GB)</th>
+            <th>Status</th>
+        </tr>
+        {{range .}}
+        <tr>
+            <td>{{.ID}}</td>
+            <td>{{.Name}}</td>
+            <td>{{.Size}}</td>
+            <td>{{.Status}}</td>
+        </tr>
+        {{end}}
+    </table>
+</body>
+</html>
