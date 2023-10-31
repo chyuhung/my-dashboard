@@ -1,30 +1,57 @@
 package config
 
 import (
-	"os"
+	"log"
+
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
+	"github.com/spf13/viper"
 )
 
-// OpenStackConfig 包含OpenStack认证参数和其他相关配置
-type OpenStackConfig struct {
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	ProjectName string `json:"project_name"`
-	DomainName  string `json:"domain_name"`
+var (
+	Username    string
+	Password    string
+	ProjectName string
+	DomainName  string
 
-	AuthURL string `json:"auth_url"`
-	Region  string `json:"region"  default:"ReginOne"`
-}
+	AuthURL string
+	Region  string
+)
 
-// LoadConfig 从环境变量中加载OpenStack配置
-func LoadConfig() OpenStackConfig {
-	config := OpenStackConfig{
-		Username:    os.Getenv("OS_USERNAME"),
-		Password:    os.Getenv("OS_PASSWORD"),
-		ProjectName: os.Getenv("OS_PROJECT_NAME"),
-		DomainName:  os.Getenv("OS_USER_DOMAIN_NAME"),
-		AuthURL:     os.Getenv("OS_AUTH_URL"),
-		Region:      os.Getenv("OS_REGION_NAME"),
+func Init() {
+	viper.AutomaticEnv()
+
+	Username = viper.GetString("OS_USERNAME")
+	Password = viper.GetString("OS_PASSWORD")
+	ProjectName = viper.GetString("OS_PROJECT_NAME")
+	DomainName = viper.GetString("OS_USER_DOMAIN_NAME")
+	AuthURL = viper.GetString("OS_AUTH_URL")
+	Region = viper.GetString("OS_REGION_NAME")
+
+	authOpts := gophercloud.AuthOptions{
+		IdentityEndpoint: AuthURL,
+		Username:         Username,
+		Password:         Password,
+		DomainName:       DomainName,
+		AllowReauth:      true,
+		Scope: &gophercloud.AuthScope{
+			ProjectName: ProjectName,
+			DomainName:  DomainName},
+	}
+	provider, err := openstack.AuthenticatedClient(authOpts)
+	if err != nil {
+		log.Println("Failed to create OpenStack client:", err)
+		return
 	}
 
-	return config
+	computeClient, err := openstack.NewComputeV2(provider, gophercloud.EndpointOpts{
+		Region: Region,
+		Name:   "nova",
+		Type:   "compute",
+	})
+	if err != nil {
+		// 错误处理
+	}
+
+	// 将computeClient传递给需要使用的服务函数
 }
