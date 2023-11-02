@@ -20,7 +20,46 @@ my-dashboard 是一个使用 Gophercloud 实现类似 OpenStack Dashboard 的功
 - Gophercloud
 - Vue
 ...
+# 项目结构
 
+```
+├── backend
+│   ├── main.go
+│   ├── config
+│   │   └── config.go
+│   ├── controllers
+│   │   ├── auth.go
+│   │   └── instances.go
+│   ├── models
+│   │   ├── instance.go
+│   │   └── user.go
+│   ├── routes
+│   │   └── routes.go
+│   ├── services
+│   │   ├── auth.go
+│   │   └── instances.go
+│   ├── utils
+│   │   └── utils.go
+│   └── tests
+│       ├── auth_test.go
+│       └── instances_test.go
+└── frontend
+    ├── public
+    │   ├── index.html
+    │   └── ...
+    ├── src
+    │   ├── assets
+    │   ├── components
+    │   ├── views
+    │   ├── App.vue
+    │   └── main.js
+    ├── .env.development
+    ├── .env.production
+    ├── babel.config.js
+    ├── package.json
+    ├── vue.config.js
+    └── ...
+```
 # 快速开始
 ## 后端
 

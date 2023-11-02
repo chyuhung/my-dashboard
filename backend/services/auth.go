@@ -1,6 +1,6 @@
 package services
 
-import "github.com/chyuhung/my-dashboard/backend/models"
+import "github.com/chyuhung/my-dashboard/models"
 
 func Authenticate(username, password string) (*models.User, error) {
 	// 鉴权逻辑
