@@ -69,7 +69,7 @@ my-dashboard 是一个使用 Gophercloud 实现类似 OpenStack Dashboard 的功
 
 安装依赖：go mod download
 
-修改配置：在 config/config.go 文件中填入正确的 OpenStack 认证信息和其他配置项
+修改配置：在环境变量中加载正确的 OpenStack 认证信息
 
 启动后端服务：go run main.go
 
