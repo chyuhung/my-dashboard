@@ -35,13 +35,17 @@ func CreateInstance(c *gin.Context) {
 		})
 		return
 	}
-
 	// TODO: 执行创建实例操作，例如将实例数据保存到数据库
-
+	err := services.CreateInstance(&instance)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "创建实例失败",
+		})
+		return
+	}
 	// 创建成功
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "实例创建成功",
-		"instance": instance,
+		"message": "实例创建成功",
 	})
 }
 

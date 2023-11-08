@@ -1,8 +1,12 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/chyuhung/my-dashboard/models"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/bootfromvolume"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/flavors"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
@@ -26,48 +30,119 @@ func GetInstances() ([]*models.Instance, error) {
 
 	instances := make([]*models.Instance, len(allInstances))
 	for i, instance := range allInstances {
+		// flavor name
+		flavor, _ := instance.Flavor["Name"].(string)
+		// volume
+		volumes := []models.Volume{}
+		for _, v := range instance.AttachedVolumes {
+			volume, err := GetVolume(v.ID)
+			if err != nil {
+				break
+			}
+			volumes = append(volumes, models.Volume{
+				Name: volume.Name,
+				Size: volume.Size,
+				Type: volume.VolumeType,
+			})
+		}
+		// network
+		networks := []models.Network{}
+		for _, v := range instance.Addresses {
+			ip, _ := v.(string)
+			networks = append(networks, models.Network{VlanId: "", Ip: ip})
+		}
+
+		// image
+		image, _ := instance.Image["Name"].(string)
+
 		// 将实例数据转换为自定义的 Instance 模型
 		instances[i] = &models.Instance{
-			// ImageName:      instance.Image.Name,
-			// FlavorName:     instance.Flavor.Name,
-			Volumes:        map[string]int{"volume1": 50, "volume2": 100}, // 替换为实际的卷数据
-			VmName:         instance.Name,
-			Networks:       map[string]string{"network1": "subnet1", "network2": "subnet2"}, // 替换为实际的网络数据
-			HostName:       instance.Metadata["host_name"],
-			VolumeTypeName: instance.Metadata["volume_type_name"],
+			Name:     instance.Name,
+			Flavor:   flavor,
+			Volumes:  volumes,
+			Networks: networks,
+			Host:     instance.HostID,
+			Image:    image,
 		}
 	}
-
 	return instances, nil
 }
 
-func CreateInstance(name string) (*models.Instance, error) {
+func CreateInstance(instance *models.Instance) error {
+	// 获取 flavorid
+	flavorId, err := GetFlavorId(instance.Flavor)
+	if err != nil {
+		return err
+	}
+	// 获取imageid
+	imageId, err := GetImageId(instance.Image)
+	if err != nil {
+		return err
+	}
+	// 获取网络
+	var networks []servers.Network
+	for _, n := range instance.Networks {
+		networkId, err := GetNetworkId(n.VlanId)
+		if err != nil {
+			return err
+		} else {
+			networks = append(networks, servers.Network{UUID: networkId, FixedIP: n.Ip})
+		}
+	}
+
+	// 从系统卷和数据卷创建实例
 	// 创建实例请求参数
 	createOpts := servers.CreateOpts{
-		Name:      name,
-		FlavorRef: "flavor_id", // 替换为实际的 flavor ID
-		ImageRef:  "image_id",  // 替换为实际的 image ID
+		Name:      instance.Name,
+		FlavorRef: flavorId,
+		Networks:  networks,
 		// 其他实例配置参数
+		AvailabilityZone: "nova",
+	}
+
+	// 遍历创建volume
+	blockDevices := []bootfromvolume.BlockDevice{}
+	for i, v := range instance.Volumes {
+		// 创建系统卷
+		if i == 0 {
+			sys, err := CreateVolume(v.Name, v.Size, v.Type, imageId)
+			if err != nil {
+				return err
+			}
+			blockDevices = append(blockDevices, bootfromvolume.BlockDevice{
+				BootIndex:  i,
+				UUID:       sys.ID,
+				SourceType: "volume",
+			})
+		} else {
+			// 创建数据卷
+			data, err := CreateVolume(v.Name, v.Size, v.Type, "")
+			if err != nil {
+				return err
+			}
+			blockDevices = append(blockDevices, bootfromvolume.BlockDevice{
+				BootIndex:  i,
+				UUID:       data.ID,
+				SourceType: "volume",
+			})
+		}
+	}
+	// 从volume启动实例
+	bootFromVolumeExt := bootfromvolume.CreateOptsExt{
+		CreateOptsBuilder: createOpts,
+		BlockDevice:       blockDevices,
 	}
 
 	// 发送创建实例请求
-	server, err := servers.Create(computeClient, createOpts).Extract()
+	_, err = bootfromvolume.Create(computeClient, bootFromVolumeExt).Extract()
 	if err != nil {
 		// 处理创建实例失败的情况
-		return nil, err
+		return err
 	}
-
-	// 将响应数据转换为自定义的 Instance 模型
-	instance := &models.Instance{
-		ID:   server.ID,
-		Name: server.Name,
-		// 其他实例数据
-	}
-
-	return instance, nil
+	return nil
 }
 
-func UpdateInstance(id string, name string) (*models.Instance, error) {
+func UpdateInstance(id string, name string) error {
 	// 更新实例请求参数
 	updateOpts := servers.UpdateOpts{
 		Name: name,
@@ -75,18 +150,35 @@ func UpdateInstance(id string, name string) (*models.Instance, error) {
 	}
 
 	// 发送更新实例请求
-	server, err := servers.Update(computeClient, id, updateOpts).Extract()
+	_, err := servers.Update(computeClient, id, updateOpts).Extract()
 	if err != nil {
 		// 处理更新实例失败的情况
-		return nil, err
+		return err
 	}
 
-	// 将响应数据转换为自定义的 Instance 模型
-	instance := &models.Instance{
-		ID:   server.ID,
-		Name: server.Name,
-		// 其他实例数据
-	}
+	return nil
+}
 
-	return instance, nil
+func GetFlavorId(flavorName string) (string, error) {
+	listOpts := flavors.ListOpts{
+		Limit: -1,
+	}
+	// 发送查询 flavor 列表请求
+	allPages, err := flavors.ListDetail(computeClient, listOpts).AllPages()
+	if err != nil {
+		// 处理查询 flavor 列表失败的情况
+		return "", err
+	}
+	flavors, err := flavors.ExtractFlavors(allPages)
+	if err != nil {
+		return "", err
+	}
+	// 遍历 flavor 列表，查找 flavor 名称匹配的 flavor
+	for _, flavor := range flavors {
+		if flavor.Name == flavorName {
+			// 返回 flavor ID
+			return flavor.ID, nil
+		}
+	}
+	return "", fmt.Errorf("flavor %s not found", flavorName)
 }
