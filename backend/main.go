@@ -1,4 +1,4 @@
-package backend
+package main
 
 import (
 	"github.com/chyuhung/my-dashboard/config"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Run() {
+func main() {
 	router := gin.Default()
 
 	config.Init()

@@ -3,22 +3,15 @@ package services
 import (
 	"fmt"
 
-	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/images"
 )
-
-var imageClient *gophercloud.ServiceClient
-
-func SetImageClient(client *gophercloud.ServiceClient) {
-	imageClient = client
-}
 
 func GetImageId(imageName string) (string, error) {
 	listOpts := images.ListOpts{
 		Limit: -1,
 	}
 	// 发送查询 image 列表请求
-	allPages, err := images.ListDetail(imageClient, listOpts).AllPages()
+	allPages, err := images.ListDetail(computeClient, listOpts).AllPages()
 	if err != nil {
 		// 处理查询 image 列表失败的情况
 		return "", err
