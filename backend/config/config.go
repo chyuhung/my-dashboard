@@ -28,11 +28,14 @@ func Init() {
 	ProjectName = viper.GetString("OS_PROJECT_NAME")
 	DomainName = viper.GetString("OS_USER_DOMAIN_NAME")
 	AuthURL = viper.GetString("OS_AUTH_URL")
+	// 默认值为"ReginOne"
+	viper.SetDefault("OS_REGION_NAME", "RegionOne")
 	Region = viper.GetString("OS_REGION_NAME")
 
 	// 环境变量值检查
 	if Username == "" || Password == "" || ProjectName == "" || DomainName == "" || AuthURL == "" || Region == "" {
-		log.Println("Failed to read OS env")
+		// 缺少必要环境变量值
+		log.Fatal("Missing required environment variables")
 		return
 	}
 
