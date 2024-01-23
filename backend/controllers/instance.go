@@ -40,6 +40,7 @@ func CreateInstance(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "创建实例失败",
+			"err":     err.Error(),
 		})
 		return
 	}

@@ -23,7 +23,7 @@ func GetFlavors() ([]flavors.Flavor, error) {
 
 func GetFlavorId(flavorName string) (string, error) {
 	listOpts := flavors.ListOpts{
-		Limit: -1,
+		Limit: 99999,
 	}
 	// 发送查询 flavor 列表请求
 	allPages, err := flavors.ListDetail(computeClient, listOpts).AllPages()

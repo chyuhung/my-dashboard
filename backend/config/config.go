@@ -38,6 +38,8 @@ func Init() {
 		log.Fatal("Missing required environment variables")
 		return
 	}
+	log.Println("Config loaded successfully")
+	log.Printf("Environment variables: Username:%s Password:%s ProjectName:%s Domain:%s AuthURL:%s Region:%s", Username, Password, ProjectName, DomainName, AuthURL, Region)
 
 	authOpts := gophercloud.AuthOptions{
 		IdentityEndpoint: AuthURL,
@@ -47,7 +49,8 @@ func Init() {
 		AllowReauth:      true,
 		Scope: &gophercloud.AuthScope{
 			ProjectName: ProjectName,
-			DomainName:  DomainName},
+			DomainName:  DomainName,
+		},
 	}
 	provider, err := openstack.AuthenticatedClient(authOpts)
 	if err != nil {
@@ -71,8 +74,8 @@ func Init() {
 	// volumeClient
 	volumeClient, err := openstack.NewBlockStorageV2(provider, gophercloud.EndpointOpts{
 		Region: Region,
-		Name:   "cinder",
-		Type:   "volume",
+		Name:   "cinderv2",
+		Type:   "volumev2",
 	})
 	if err != nil {
 		log.Println("Failed to create volume service client:", err)

@@ -16,7 +16,7 @@ func SetNetworkClient(client *gophercloud.ServiceClient) {
 
 func GetNetworkId(networkName string) (string, error) {
 	listOpts := networks.ListOpts{
-		Limit: -1,
+		Limit: 99999,
 	}
 	// 发送查询 network 列表请求
 	allPages, err := networks.List(networkClient, listOpts).AllPages()

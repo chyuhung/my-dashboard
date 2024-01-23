@@ -8,7 +8,7 @@ import (
 
 func GetImageId(imageName string) (string, error) {
 	listOpts := images.ListOpts{
-		Limit: -1,
+		Limit: 99999,
 	}
 	// 发送查询 image 列表请求
 	allPages, err := images.ListDetail(computeClient, listOpts).AllPages()
