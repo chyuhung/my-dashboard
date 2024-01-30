@@ -29,3 +29,19 @@ func GetImageId(imageName string) (string, error) {
 	}
 	return "", fmt.Errorf("image %s not found", imageName)
 }
+
+func ListImages() ([]images.Image, error) {
+	listOpts := images.ListOpts{
+		Limit: 99999,
+	}
+	allPages, err := images.ListDetail(computeClient, listOpts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	images, err := images.ExtractImages(allPages)
+	if err != nil {
+		return nil, err
+	}
+
+	return images, nil
+}

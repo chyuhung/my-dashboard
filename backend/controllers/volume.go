@@ -17,7 +17,7 @@ func ListVolumes(c *gin.Context) {
 		return
 	}
 
-	// 返回实例数据
+	// 返回数据
 	c.JSON(http.StatusOK, gin.H{
 		"data": volumes,
 	})

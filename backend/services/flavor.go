@@ -8,7 +8,7 @@ import (
 
 func GetFlavors() ([]flavors.Flavor, error) {
 	listOpts := flavors.ListOpts{
-		Limit: -1,
+		Limit: 99999,
 	}
 	allPages, err := flavors.ListDetail(computeClient, listOpts).AllPages()
 	if err != nil {
