@@ -13,8 +13,11 @@ func SetComputeClient(client *gophercloud.ServiceClient) {
 	computeClient = client
 }
 
+// 获取实例信息
 func GetInstances() ([]*models.Instance, error) {
-	listOpts := servers.ListOpts{}
+	listOpts := servers.ListOpts{
+		Limit: 99999,
+	}
 	allPages, err := servers.List(computeClient, listOpts).AllPages()
 	if err != nil {
 		return nil, err
@@ -24,11 +27,11 @@ func GetInstances() ([]*models.Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	// 存储实例信息
 	instances := make([]*models.Instance, len(allInstances))
 	for i, instance := range allInstances {
 		// flavor name
-		flavor, _ := instance.Flavor["Name"].(string)
+		flavor, _ := instance.Flavor["original_name"].(string)
 		// volume
 		volumes := []models.Volume{}
 		for _, v := range instance.AttachedVolumes {
