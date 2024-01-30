@@ -124,6 +124,21 @@ func CreateInstance(instance *models.Instance) error {
 			})
 		}
 	}
+	// 检查volume状态，状态available后开始创建虚拟机
+	// 创建一组 chan 作为标记
+	channels := make([]chan bool, len(blockDevices))
+
+	// 启动协程并将标记通道传递给每个协程
+	for i, v := range blockDevices {
+		channels[i] = make(chan bool)
+		go CheckVolStatus(v.UUID, channels[i])
+	}
+
+	// 等待所有标记完成，所有volume完成创建并可用，继续执行
+	for _, ch := range channels {
+		<-ch // 从通道接收结果
+	}
+
 	// 从volume启动实例
 	bootFromVolumeExt := bootfromvolume.CreateOptsExt{
 		CreateOptsBuilder: createOpts,

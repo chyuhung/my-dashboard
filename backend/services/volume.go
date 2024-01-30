@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/chyuhung/my-dashboard/models"
 	"github.com/gophercloud/gophercloud"
@@ -67,6 +68,28 @@ func GetVolume(id string) (volumes.Volume, error) {
 		return volumes.Volume{}, err
 	}
 	return *volume, nil
+}
+
+func CheckVolStatus(id string, ch chan bool) {
+	for {
+		// 检查 vol 状态是否为 available
+		vol, err := GetVolume(id)
+		if err != nil {
+			ch <- false // 将结果发送到通道，表示失败
+			return
+		}
+		status := vol.Status
+
+		if status == "available" {
+			ch <- true // 将结果发送到通道，表示完成
+			return
+		} else if status == "error" {
+			ch <- false // 将结果发送到通道，表示失败
+			return
+		}
+
+		time.Sleep(5 * time.Second) // 休眠后再次检查
+	}
 }
 
 func CreateVolume(name string, size int, volumeType string, imageId string) (volumes.Volume, error) {
