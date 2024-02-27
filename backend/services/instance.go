@@ -13,6 +13,36 @@ func SetComputeClient(client *gophercloud.ServiceClient) {
 	computeClient = client
 }
 
+// 获取单个实例信息
+func GetInstance(id string) (*models.Instance, error) {
+	server, err := servers.Get(computeClient, id).Extract()
+	if err != nil {
+		return nil, err
+	}
+
+	// 返回信息，依照models中的instance定义
+	var result models.Instance
+	// 名称
+	result.Name = server.Name
+	// 规格
+	result.Flavor, _ = server.Flavor["name"].(string)
+	// 镜像
+	result.Image, _ = server.Image["name"].(string)
+	// volumes
+	var volumes []*models.Volume
+	for v := range server.AttachedVolumes {
+		info, _ := GetVolume(server.AttachedVolumes[v].ID)
+		volume := &models.Volume{Name: info.Name, Size: info.Size, Type: info.VolumeType}
+		_ = append(volumes, volume)
+	}
+	// networks
+	var networks []*models.Network
+	for v := range server.Addresses {
+	}
+	// 宿主机
+	return nil, nil
+}
+
 // 获取实例信息
 func GetInstances() ([]*models.Instance, error) {
 	listOpts := servers.ListOpts{

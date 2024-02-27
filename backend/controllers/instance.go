@@ -8,6 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetInstance(c *gin.Context) {
+	id := c.Param("id")
+	data, err := services.GetInstance(id)
+	c.JSON(http.StatusOK, gin.H{
+		"data":    data,
+		"message": err,
+	})
+
+}
+
 func ListInstances(c *gin.Context) {
 	// 获取实例数据
 	instances, err := services.GetInstances()

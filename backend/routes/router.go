@@ -23,8 +23,13 @@ func Setup(router *gin.Engine) {
 	// instance
 	instancesRoutes := router.Group("/instances")
 	{
+		// 所有虚拟机列表
 		instancesRoutes.GET("/", controllers.ListInstances)
+		// 查询单个
+		instancesRoutes.GET("/:id", controllers.GetInstance)
+		// 新增
 		instancesRoutes.POST("/", controllers.CreateInstance)
+		// 编辑
 		instancesRoutes.PUT("/:id", controllers.UpdateInstance)
 	}
 

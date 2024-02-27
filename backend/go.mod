@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/gophercloud/gophercloud v1.8.0
+	github.com/gophercloud/gophercloud v1.9.0
 	github.com/spf13/viper v1.17.0
 )
 
