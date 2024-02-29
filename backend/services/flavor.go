@@ -8,13 +8,10 @@ import (
 
 // 获取单个规格信息
 func GetFlavor(id string) (*flavors.Flavor, error) {
-	flavor, err := flavors.Get(computeClient, id).Extract()
-	if err != nil {
-		return nil, err
-	}
-	return flavor, nil
+	return flavors.Get(computeClient, id).Extract()
 }
 
+// 获取规格列表
 func GetFlavors() ([]flavors.Flavor, error) {
 	listOpts := flavors.ListOpts{
 		Limit: 99999,

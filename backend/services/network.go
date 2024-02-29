@@ -14,6 +14,34 @@ func SetNetworkClient(client *gophercloud.ServiceClient) {
 	networkClient = client
 }
 
+// 获取单个网络信息
+func GetNetwork(id string) (*networks.Network, error) {
+	return networks.Get(networkClient, id).Extract()
+
+}
+
+// 获取网络列表
+func ListNetworks() ([]*models.Network, error) {
+	var data []*models.Network
+	listOpts := networks.ListOpts{}
+
+	allPages, err := networks.List(networkClient, listOpts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	allNetworks, err := networks.ExtractNetworks(allPages)
+	if err != nil {
+		return nil, err
+	}
+	for _, network := range allNetworks {
+		data = append(data, &models.Network{
+			Vlan: network.Name,
+			Ip:   "",
+		})
+	}
+	return data, nil
+}
+
 func GetNetworkId(networkName string) (string, error) {
 	listOpts := networks.ListOpts{
 		Limit: 99999,
@@ -36,33 +64,4 @@ func GetNetworkId(networkName string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("network %s not found", networkName)
-}
-
-func ListNetworks() ([]*models.Network, error) {
-	var data []*models.Network
-	listOpts := networks.ListOpts{}
-
-	allPages, err := networks.List(networkClient, listOpts).AllPages()
-	if err != nil {
-		return nil, err
-	}
-	allNetworks, err := networks.ExtractNetworks(allPages)
-	if err != nil {
-		return nil, err
-	}
-	for _, network := range allNetworks {
-		data = append(data, &models.Network{
-			Vlan: network.Name,
-			Ip:   "",
-		})
-	}
-	return data, nil
-}
-
-func GetNetwork(id string) (networks.Network, error) {
-	network, err := networks.Get(networkClient, id).Extract()
-	if err != nil {
-		return networks.Network{}, err
-	}
-	return *network, nil
 }

@@ -16,13 +16,35 @@ func SetVolumeClient(client *gophercloud.ServiceClient) {
 	volumeClient = client
 }
 
-// 查询单个volume信息
-func GetVolume(id string) (volumes.Volume, error) {
-	volume, err := volumes.Get(volumeClient, id).Extract()
+// 获取单个volume信息
+func GetVolume(id string) (*volumes.Volume, error) {
+	return volumes.Get(volumeClient, id).Extract()
+
+}
+
+// 获取volumes列表
+func ListVolumes() ([]*models.Volume, error) {
+	var data []*models.Volume
+	listOpts := volumes.ListOpts{}
+
+	allPages, err := volumes.List(volumeClient, listOpts).AllPages()
 	if err != nil {
-		return volumes.Volume{}, err
+		return nil, err
 	}
-	return *volume, nil
+	fmt.Println(allPages)
+	allVolumes, err := volumes.ExtractVolumes(allPages)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(allVolumes)
+	for _, volume := range allVolumes {
+		data = append(data, &models.Volume{
+			Name: volume.Name,
+			Size: volume.Size,
+			Type: volume.VolumeType,
+		})
+	}
+	return data, nil
 }
 
 func GetVolumeTypeId(volumeTypeName string) (string, error) {
@@ -47,30 +69,6 @@ func GetVolumeTypeId(volumeTypeName string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("volueType %s not found", volumeTypeName)
-}
-
-func ListVolumes() ([]*models.Volume, error) {
-	var data []*models.Volume
-	listOpts := volumes.ListOpts{}
-
-	allPages, err := volumes.List(volumeClient, listOpts).AllPages()
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println(allPages)
-	allVolumes, err := volumes.ExtractVolumes(allPages)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println(allVolumes)
-	for _, volume := range allVolumes {
-		data = append(data, &models.Volume{
-			Name: volume.Name,
-			Size: volume.Size,
-			Type: volume.VolumeType,
-		})
-	}
-	return data, nil
 }
 
 func CheckVolStatus(id string, ch chan bool) {

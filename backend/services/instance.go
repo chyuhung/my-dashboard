@@ -49,7 +49,7 @@ func GetInstance(id string) (*models.Instance, error) {
 	return result, nil
 }
 
-// 获取实例信息
+// 获取实例列表
 func GetInstances() ([]*models.Instance, error) {
 	listOpts := servers.ListOpts{
 		Limit: 99999,
