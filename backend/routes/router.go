@@ -1,55 +1,46 @@
 package routes
 
 import (
-	"github.com/chyuhung/my-dashboard/controllers"
+	v1 "github.com/chyuhung/my-dashboard/controllers/v1"
 	"github.com/gin-gonic/gin"
 )
 
 func Setup(router *gin.Engine) {
-	authRoutes := router.Group("/auth")
+	auth := router.Group("/v1")
+	// 登录注册模块
 	{
-		authRoutes.POST("/login", controllers.Login)
-		authRoutes.POST("/logout", controllers.Logout)
-		authRoutes.POST("/register", controllers.Register)
+		auth.POST("login", v1.Login)
+		auth.POST("logout", v1.Logout)
+		auth.POST("register", v1.Register)
 	}
-
-	// flavor
-	flavorRoutes := router.Group("/flavors")
+	r := router.Group("/v1")
 	{
-		flavorRoutes.GET("/", controllers.ListFlavors)
-		flavorRoutes.GET("/:id", controllers.GetFlavor)
-	}
+		// flavor
+		// 所有规格列表
+		r.GET("flavors", v1.ListFlavors)
+		// 查询单个规格
+		r.GET("flavor/:id", v1.GetFlavor)
 
-	// instance
-	instancesRoutes := router.Group("/instances")
-	{
+		// instance
 		// 所有虚拟机列表
-		instancesRoutes.GET("/", controllers.ListInstances)
-		// 查询单个
-		instancesRoutes.GET("/:id", controllers.GetInstance)
+		r.GET("instances", v1.ListInstances)
+		// 查询单个虚拟机
+		r.GET("instance/:id", v1.GetInstance)
 		// 新增
-		instancesRoutes.POST("/", controllers.CreateInstance)
+		r.POST("instance/add", v1.CreateInstance)
 		// 编辑
-		instancesRoutes.PUT("/:id", controllers.UpdateInstance)
-	}
+		r.PUT("/:id", v1.UpdateInstance)
 
-	// volume
-	volumeRoutes := router.Group("/volumes")
-	{
-		volumeRoutes.GET("/", controllers.ListVolumes)
-		volumeRoutes.GET("/:id", controllers.GetVolume)
+		// volume
+		r.GET("volumes", v1.ListVolumes)
+		r.GET("volume/:id", v1.GetVolume)
+
+		// network
+		r.GET("networks", v1.ListNetworks)
+		r.GET("network/:id", v1.GetNetwork)
+
+		// image
+		r.GET("images", v1.ListImages)
+		r.GET("image/:id", v1.GetImage)
 	}
-	// network
-	networkRoutes := router.Group("/networks")
-	{
-		networkRoutes.GET("/", controllers.ListNetworks)
-		networkRoutes.GET("/:id", controllers.GetNetwork)
-	}
-	// image
-	imageRoutes := router.Group("/images")
-	{
-		imageRoutes.GET("/", controllers.ListImages)
-		imageRoutes.GET("/:id", controllers.GetImage)
-	}
-	// 其他路由设置...
 }

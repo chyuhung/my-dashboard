@@ -18,8 +18,8 @@ type User struct {
 	Password string `label:"密码" json:"password"`
 }
 type Network struct {
-	VlanId string `label:"VLAN ID" json:"vlan_id"`
-	Ip     string `label:"IP" json:"ip"`
+	Vlan string `label:"VLAN" json:"vlan"`
+	Ip   string `label:"地址" json:"ip"`
 }
 
 type Volume struct {

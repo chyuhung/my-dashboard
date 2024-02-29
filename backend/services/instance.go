@@ -21,12 +21,13 @@ func GetInstance(id string) (*models.Instance, error) {
 	}
 
 	// 返回信息，依照models中的instance定义
-	var result models.Instance
+	var result = &models.Instance{}
 	// 名称
 	result.Name = server.Name
 	// 规格
 	result.Flavor, _ = server.Flavor["name"].(string)
 	// 镜像
+	// 需优化通过卷来获取镜像
 	result.Image, _ = server.Image["name"].(string)
 	// volumes
 	var volumes []*models.Volume
@@ -36,11 +37,16 @@ func GetInstance(id string) (*models.Instance, error) {
 		_ = append(volumes, volume)
 	}
 	// networks
+	// 需优化通过ip查询vlan名称
 	var networks []*models.Network
-	for v := range server.Addresses {
+	for _, v := range server.Addresses {
+		ip, _ := v.(string)
+		_ = append(networks, &models.Network{Vlan: "", Ip: ip})
 	}
 	// 宿主机
-	return nil, nil
+	// 需优化通过id查询宿主机名称
+	result.Host = server.HostID
+	return result, nil
 }
 
 // 获取实例信息
@@ -79,7 +85,7 @@ func GetInstances() ([]*models.Instance, error) {
 		networks := []models.Network{}
 		for _, v := range instance.Addresses {
 			ip, _ := v.(string)
-			networks = append(networks, models.Network{VlanId: "", Ip: ip})
+			networks = append(networks, models.Network{Vlan: "", Ip: ip})
 		}
 
 		// image
@@ -112,7 +118,7 @@ func CreateInstance(instance *models.Instance) error {
 	// 获取网络
 	var networks []servers.Network
 	for _, n := range instance.Networks {
-		networkId, err := GetNetworkId(n.VlanId)
+		networkId, err := GetNetworkId(n.Vlan)
 		if err != nil {
 			return err
 		} else {

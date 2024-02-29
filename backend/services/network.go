@@ -52,8 +52,8 @@ func ListNetworks() ([]*models.Network, error) {
 	}
 	for _, network := range allNetworks {
 		data = append(data, &models.Network{
-			VlanId: network.Name,
-			Ip:     "",
+			Vlan: network.Name,
+			Ip:   "",
 		})
 	}
 	return data, nil
