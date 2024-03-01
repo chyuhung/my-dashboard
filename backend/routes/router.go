@@ -2,13 +2,13 @@ package routes
 
 import (
 	v1 "github.com/chyuhung/my-dashboard/controllers/v1"
-	"github.com/chyuhung/my-dashboard/middleware"
+	middlewares "github.com/chyuhung/my-dashboard/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
 func Setup() {
 	router := gin.Default()
-	router.Use(middleware.Cors())
+	router.Use(middlewares.Cors())
 
 	auth := router.Group("/v1")
 	// 登录注册模块
