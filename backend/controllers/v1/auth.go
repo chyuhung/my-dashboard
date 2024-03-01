@@ -10,7 +10,6 @@ import (
 
 func Login(c *gin.Context) {
 	var user models.User
-	var token string
 
 	c.ShouldBindJSON(&user)
 	// 获取用户提交的登录信息
