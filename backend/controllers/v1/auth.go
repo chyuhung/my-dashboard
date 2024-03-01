@@ -3,16 +3,19 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/chyuhung/my-dashboard/models"
 	"github.com/gin-gonic/gin"
 )
 
 func Login(c *gin.Context) {
+	var user models.User
+	c.ShouldBindJSON(&user)
 	// 获取用户提交的登录信息
-	username := c.PostForm("username")
-	password := c.PostForm("password")
+	username := user.Username
+	password := user.Password
 
 	// 简单的验证逻辑
-	if username == "admin" && password == "admin" {
+	if username == "admin" && password == "123456" {
 		// 登录成功
 		c.JSON(http.StatusOK, gin.H{
 			"message": "登录成功",
