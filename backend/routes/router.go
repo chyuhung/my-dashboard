@@ -2,10 +2,14 @@ package routes
 
 import (
 	v1 "github.com/chyuhung/my-dashboard/controllers/v1"
+	"github.com/chyuhung/my-dashboard/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-func Setup(router *gin.Engine) {
+func Setup() {
+	router := gin.Default()
+	router.Use(middleware.Cors())
+
 	auth := router.Group("/v1")
 	// 登录注册模块
 	{
@@ -43,4 +47,6 @@ func Setup(router *gin.Engine) {
 		r.GET("images", v1.ListImages)
 		r.GET("image/:id", v1.GetImage)
 	}
+
+	router.Run(":8080")
 }

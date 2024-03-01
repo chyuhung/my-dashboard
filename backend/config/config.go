@@ -38,7 +38,7 @@ func Init() {
 		log.Fatal("Missing required environment variables")
 		return
 	}
-	log.Println("Config loaded successfully")
+	log.Println("OpenStack configuration loading successful")
 	log.Printf("Environment variables: Username:%s Password:%s ProjectName:%s Domain:%s AuthURL:%s Region:%s", Username, Password, ProjectName, DomainName, AuthURL, Region)
 
 	authOpts := gophercloud.AuthOptions{
