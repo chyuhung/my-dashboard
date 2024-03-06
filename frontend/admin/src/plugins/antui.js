@@ -21,6 +21,9 @@ message.config({
   maxCount: 3
 })
 
+Vue.prototype.$message = message
+Vue.prototype.$confirm = Modal.confirm
+
 Vue.use(Button)
 Vue.use(FormModel)
 Vue.use(Input)

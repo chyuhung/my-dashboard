@@ -91,14 +91,14 @@ export default {
     resetForm() {
       this.$refs.loginFormRef.resetFields()
     },
+
     login() {
       this.$refs.loginFormRef.validate(async (valid) => {
         if (!valid) return this.$message.error('输入不合规，请按要求修改')
         const { data: res } = await this.$http.post('login', this.formdata)
-        // console.log(res)
         if (res.status !== 200) return this.$message.error(res.message)
         window.sessionStorage.setItem('token', res.token)
-        this.$router.push('admin/index')
+        this.$router.push('index')
         return this.$message.info('登录成功，欢迎回来')
       })
     }

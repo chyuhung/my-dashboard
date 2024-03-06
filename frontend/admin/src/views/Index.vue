@@ -1,3 +1,3 @@
 <template>
-  <div>Admin</div>
+  <div>Index</div>
 </template>
