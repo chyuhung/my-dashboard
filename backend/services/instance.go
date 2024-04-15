@@ -13,6 +13,51 @@ func SetComputeClient(client *gophercloud.ServiceClient) {
 	computeClient = client
 }
 
+// 通过ip获取实例信息
+func GetInstanceByIp(ip string) (*models.Instance, error) {
+	var listOpts = servers.ListOpts{
+		IP: ip,
+	}
+	allPages, err := servers.List(computeClient, listOpts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	allInstances, err := servers.ExtractServers(allPages)
+	if err != nil {
+		return nil, err
+	}
+	for _, instance := range allInstances {
+		for _, v := range instance.Addresses {
+			address, _ := v.(string)
+			if ip == address {
+				return GetInstance(instance.ID)
+			}
+		}
+	}
+	return nil, nil
+}
+
+// 通过name获取实例信息
+func GetInstanceByName(name string) (*models.Instance, error) {
+	var listOpts = servers.ListOpts{
+		Name: name,
+	}
+	allPages, err := servers.List(computeClient, listOpts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	allInstances, err := servers.ExtractServers(allPages)
+	if err != nil {
+		return nil, err
+	}
+	for _, instance := range allInstances {
+		if name == instance.Name {
+			return GetInstance(instance.ID)
+		}
+	}
+	return nil, nil
+}
+
 // 获取单个实例信息
 func GetInstance(id string) (*models.Instance, error) {
 	server, err := servers.Get(computeClient, id).Extract()

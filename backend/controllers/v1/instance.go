@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"net"
 	"net/http"
 
 	"github.com/chyuhung/my-dashboard/models"
@@ -9,13 +10,22 @@ import (
 )
 
 func GetInstance(c *gin.Context) {
-	id := c.Param("id")
-	data, err := services.GetInstance(id)
+	str := c.Param("id")
+	var data *models.Instance
+	var err error
+
+	// 判断str是否是IP
+	ip := net.ParseIP(str)
+	if ip != nil {
+		data, err = services.GetInstanceByIp(str)
+	} else {
+		data, err = services.GetInstanceByName(str)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"data":    data,
 		"message": err,
 	})
-
 }
 
 func ListInstances(c *gin.Context) {
