@@ -109,7 +109,7 @@ export default {
 <style scoped>
 .container {
   height: 100%;
-  background-color: rgba(14, 19, 40, 0.687);
+  background-color: rgba(218, 218, 218, 0.687);
 }
 .loginBox {
   width: 450px;
