@@ -1,12 +1,13 @@
 <template>
   <div class="container">
-    <!-- <div class="header"><Header></Header></div> -->
     <div class="topBar">
       <div class="spacer">
         <a-button type="primary" @click="logout">退出</a-button>
       </div>
     </div>
-    <div class="title"><h1 class="title">mydashboard</h1></div>
+    <div class="title">
+      <h1 class="title">mydashboard</h1>
+    </div>
     <div class="searchBox">
       <a-input
         v-model="searchText"
@@ -19,26 +20,58 @@
         >搜索</a-button
       >
     </div>
-    <div class="footer"><Footer></Footer></div>
+    <div class="searchResults" v-if="searchResults">
+      <table>
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>主机</th>
+            <th>规格</th>
+            <th>镜像</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ searchResults.name }}</td>
+            <td>{{ searchResults.host }}</td>
+            <td>{{ searchResults.flavor }}</td>
+            <td>{{ searchResults.image }}</td>
+            <td>
+              <a-button type="primary" @click="reinstall(searchResults)"
+                >重装</a-button
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      searchText: '',
+      searchResults: null
+    }
+  },
   methods: {
     logout() {
       window.sessionStorage.clear('token')
       this.$router.push('/login')
     },
-    search() {
-      this.$refs.loginFormRef.validate(async (valid) => {
-        if (!valid) return this.$message.error('输入不合规，请按要求修改')
-        const { data: res } = await this.$http.post('login', this.formdata)
-        if (res.status !== 200) return this.$message.error(res.message)
-        window.sessionStorage.setItem('token', res.token)
-        this.$router.push('index')
-        return this.$message.info('登录成功，欢迎回来')
-      })
+    async search() {
+      try {
+        const { data } = await this.$http.get(`instance/${this.searchText}`)
+        if (data.message) {
+          this.$message.error(data.message)
+        } else {
+          this.searchResults = data.data
+        }
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }
@@ -72,5 +105,9 @@ export default {
 .searchBox {
   display: flex;
   align-items: center;
+}
+
+.searchResults {
+  margin-top: 20px;
 }
 </style>
