@@ -60,26 +60,23 @@ func GetInstanceByName(name string) (*models.Instance, error) {
 
 // 获取单个实例信息
 func GetInstance(id string) (*models.Instance, error) {
+	// 根据id获取实例信息
 	server, err := servers.Get(computeClient, id).Extract()
 	if err != nil {
 		return nil, err
 	}
 
-	// 返回信息，依照models中的instance定义
+	// 根据models中的instance定义重新组合实例信息
 	var result = &models.Instance{}
 	// 名称
 	result.Name = server.Name
 	// 规格
 	result.Flavor, _ = server.Flavor["name"].(string)
-	// 镜像
-	// 需优化通过卷来获取镜像
-	result.Image, _ = server.Image["name"].(string)
-	// volumes
+	// volumes和镜像
 	var volumes []*models.Volume
 	for v := range server.AttachedVolumes {
 		info, _ := GetVolume(server.AttachedVolumes[v].ID)
-		volume := &models.Volume{Name: info.Name, Size: info.Size, Type: info.VolumeType}
-		_ = append(volumes, volume)
+		_ = append(volumes, info)
 	}
 	// networks
 	// 需优化通过ip查询vlan名称
@@ -121,9 +118,10 @@ func GetInstances() ([]*models.Instance, error) {
 				break
 			}
 			volumes = append(volumes, models.Volume{
-				Name: volume.Name,
-				Size: volume.Size,
-				Type: volume.VolumeType,
+				Name:  volume.Name,
+				Size:  volume.Size,
+				Type:  volume.Type,
+				Image: volume.Image,
 			})
 		}
 		// network
@@ -132,10 +130,6 @@ func GetInstances() ([]*models.Instance, error) {
 			ip, _ := v.(string)
 			networks = append(networks, models.Network{Vlan: "", Ip: ip})
 		}
-
-		// image
-		image, _ := instance.Image["Name"].(string)
-
 		// 将实例数据转换为自定义的 Instance 模型
 		instances[i] = &models.Instance{
 			Name:     instance.Name,
@@ -143,7 +137,6 @@ func GetInstances() ([]*models.Instance, error) {
 			Volumes:  volumes,
 			Networks: networks,
 			Host:     instance.HostID,
-			Image:    image,
 		}
 	}
 	return instances, nil
@@ -152,11 +145,6 @@ func GetInstances() ([]*models.Instance, error) {
 func CreateInstance(instance *models.Instance) error {
 	// 获取 flavorid
 	flavorId, err := GetFlavorId(instance.Flavor)
-	if err != nil {
-		return err
-	}
-	// 获取imageid
-	imageId, err := GetImageId(instance.Image)
 	if err != nil {
 		return err
 	}
@@ -186,7 +174,7 @@ func CreateInstance(instance *models.Instance) error {
 	for i, v := range instance.Volumes {
 		// 创建系统卷
 		if i == 0 {
-			sys, err := CreateVolume(v.Name, v.Size, v.Type, imageId)
+			sys, err := CreateVolume(v.Name, v.Size, v.Type, v.Image.Id)
 			if err != nil {
 				return err
 			}

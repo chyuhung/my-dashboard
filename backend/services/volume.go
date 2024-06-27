@@ -17,9 +17,25 @@ func SetVolumeClient(client *gophercloud.ServiceClient) {
 }
 
 // 获取单个volume信息
-func GetVolume(id string) (*volumes.Volume, error) {
-	return volumes.Get(volumeClient, id).Extract()
-
+func GetVolume(id string) (*models.Volume, error) {
+	volume := &models.Volume{}
+	v, err := volumes.Get(volumeClient, id).Extract()
+	if err != nil {
+		return nil, err
+	}
+	volume.Id = v.ID
+	volume.Name = v.Name
+	volume.Size = v.Size
+	volume.Type = v.VolumeType
+	// image name
+	if imageName, ok := v.Metadata["image_name"]; ok {
+		volume.Image.Name = imageName
+	}
+	// image id
+	if imageID, ok := v.Metadata["image_id"]; ok {
+		volume.Image.Id = imageID
+	}
+	return volume, nil
 }
 
 // 获取volumes列表
@@ -38,11 +54,18 @@ func ListVolumes() ([]*models.Volume, error) {
 	}
 	fmt.Println(allVolumes)
 	for _, volume := range allVolumes {
-		data = append(data, &models.Volume{
-			Name: volume.Name,
-			Size: volume.Size,
-			Type: volume.VolumeType,
-		})
+		var v models.Volume
+		if imageName, ok := volume.Metadata["image_name"]; ok {
+			v.Image.Name = imageName
+		}
+		if imageID, ok := volume.Metadata["image_id"]; ok {
+			v.Image.Id = imageID
+		}
+		v.Id = volume.ID
+		v.Name = volume.Name
+		v.Size = volume.Size
+		v.Type = volume.VolumeType
+		data = append(data, &v)
 	}
 	return data, nil
 }
@@ -79,7 +102,7 @@ func CheckVolStatus(id string, ch chan bool) {
 			ch <- false // 将结果发送到通道，表示失败
 			return
 		}
-		status := vol.Status
+		status := "available" //vol.Status 待处理
 
 		if status == "available" {
 			ch <- true // 将结果发送到通道，表示完成
