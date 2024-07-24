@@ -2,13 +2,15 @@ package services
 
 import (
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/bootfromvolume"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
 var computeClient *gophercloud.ServiceClient
 
-// func SetComputeClient(client *gophercloud.ServiceClient) {
-// 	computeClient = client
-// }
+func SetComputeClient(client *gophercloud.ServiceClient) {
+	computeClient = client
+}
 
 // // 通过ip获取实例信息
 // func GetInstanceByIp(ip string) (*models.Instance, error) {
@@ -239,3 +241,11 @@ var computeClient *gophercloud.ServiceClient
 
 // 	return nil
 // }
+
+func CreateServerFromVolume(createOpts servers.CreateOpts, blockDevices []bootfromvolume.BlockDevice) (*servers.Server, error) {
+	var createOptsExt = bootfromvolume.CreateOptsExt{
+		CreateOptsBuilder: createOpts,
+		BlockDevice:       blockDevices,
+	}
+	return bootfromvolume.Create(computeClient, createOptsExt).Extract()
+}

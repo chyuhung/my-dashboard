@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumes"
 )
 
 var volumeClient *gophercloud.ServiceClient
@@ -123,3 +124,7 @@ func SetVolumeClient(client *gophercloud.ServiceClient) {
 // 	}
 // 	return *volume, nil
 // }
+
+func VolumeCreate(createOpts volumes.CreateOpts) (*volumes.Volume, error) {
+	return volumes.Create(volumeClient, createOpts).Extract()
+}

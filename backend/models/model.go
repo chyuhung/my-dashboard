@@ -1,5 +1,10 @@
 package models
 
+import (
+	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumes"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
+)
+
 // type Instance struct {
 // 	Name     string    `label:"虚拟机名称" json:"name"`
 // 	Flavor   string    `label:"规格名称" json:"flavor"`
@@ -26,4 +31,15 @@ package models
 type User struct {
 	Username string `label:"用户名" json:"username"`
 	Password string `label:"密码" json:"password"`
+}
+
+type CustomVolumeCreateOpts struct {
+	BootIndex  int `label:"启动顺序" json:"bootindex"`
+	CreateOpts volumes.CreateOpts
+}
+
+// CustomCreateOpts 结构体包含创建服务器和创建卷的选项
+type CustomCreateOpts struct {
+	ServerCreateOpts servers.CreateOpts       // 服务器创建选项
+	VolumeCreateOpts []CustomVolumeCreateOpts // 卷创建选项列表
 }
