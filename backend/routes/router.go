@@ -14,36 +14,10 @@ func Setup() {
 	auth := router.Group("/v1")
 	auth.Use(middlewares.JwtToken())
 	{
-		// flavor
-		// 所有规格列表
-		auth.GET("flavors", v1.ListFlavors)
-		// 查询单个规格
-		auth.GET("flavor/:id", v1.GetFlavor)
-
-		// instance
-		// 所有虚拟机列表
-		auth.GET("instances", v1.ListInstances)
-		// 查询单个虚拟机
-		auth.GET("instance/:id", v1.GetInstance)
-		// 新增
-		auth.POST("instance/add", v1.CreateInstance)
-		// 编辑
-		auth.PUT("/:id", v1.UpdateInstance)
-
-		// volume
-		auth.GET("volumes", v1.ListVolumes)
-		auth.GET("volume/:id", v1.GetVolume)
-
-		// network
-		auth.GET("networks", v1.ListNetworks)
-		auth.GET("network/:id", v1.GetNetwork)
-
-		// image
-		auth.GET("images", v1.ListImages)
-		auth.GET("image/:id", v1.GetImage)
+		auth.POST("/servers", v1.CreateServerHandler) // 创建 Server
 	}
 
-	// 无需认证
+	// 无需认证的路由
 	r := router.Group("/v1")
 	// 登录注册模块
 	{

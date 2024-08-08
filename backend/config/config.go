@@ -3,96 +3,144 @@ package config
 import (
 	"log"
 
-	"github.com/chyuhung/my-dashboard/services"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/spf13/viper"
 )
 
-var (
+// Config 结构体用于存储 OpenStack 配置
+type Config struct {
 	Username    string
 	Password    string
 	ProjectName string
 	DomainName  string
+	AuthURL     string
+	Region      string
+}
 
-	AuthURL string
-	Region  string
-)
+var config Config
 
-func Init() {
-	// 读取环境变量
+// loadConfig 加载环境变量配置
+func loadConfig() {
 	viper.AutomaticEnv()
 
-	Username = viper.GetString("OS_USERNAME")
-	Password = viper.GetString("OS_PASSWORD")
-	ProjectName = viper.GetString("OS_PROJECT_NAME")
-	DomainName = viper.GetString("OS_USER_DOMAIN_NAME")
-	AuthURL = viper.GetString("OS_AUTH_URL")
-	// 默认值为"ReginOne"
+	config.Username = viper.GetString("OS_USERNAME")
+	config.Password = viper.GetString("OS_PASSWORD")
+	config.ProjectName = viper.GetString("OS_PROJECT_NAME")
+	config.DomainName = viper.GetString("OS_USER_DOMAIN_NAME")
+	config.AuthURL = viper.GetString("OS_AUTH_URL")
+
 	viper.SetDefault("OS_REGION_NAME", "RegionOne")
-	Region = viper.GetString("OS_REGION_NAME")
+	config.Region = viper.GetString("OS_REGION_NAME")
 
-	// 环境变量值检查
-	if Username == "" || Password == "" || ProjectName == "" || DomainName == "" || AuthURL == "" || Region == "" {
-		// 缺少必要环境变量值
+	if config.Username == "" || config.Password == "" || config.ProjectName == "" || config.DomainName == "" || config.AuthURL == "" || config.Region == "" {
 		log.Fatal("Missing required environment variables")
-		return
 	}
-	log.Println("OpenStack configuration loading successful")
-	log.Printf("Environment variables: Username:%s Password:%s ProjectName:%s Domain:%s AuthURL:%s Region:%s", Username, Password, ProjectName, DomainName, AuthURL, Region)
+}
 
+// getProviderClient 获取已认证的 ProviderClient
+func getProviderClient() (*gophercloud.ProviderClient, error) {
 	authOpts := gophercloud.AuthOptions{
-		IdentityEndpoint: AuthURL,
-		Username:         Username,
-		Password:         Password,
-		DomainName:       DomainName,
+		IdentityEndpoint: config.AuthURL,
+		Username:         config.Username,
+		Password:         config.Password,
+		DomainName:       config.DomainName,
 		AllowReauth:      true,
 		Scope: &gophercloud.AuthScope{
-			ProjectName: ProjectName,
-			DomainName:  DomainName,
+			ProjectName: config.ProjectName,
+			DomainName:  config.DomainName,
 		},
 	}
-	provider, err := openstack.AuthenticatedClient(authOpts)
+
+	return openstack.AuthenticatedClient(authOpts)
+}
+
+// createComputeClient 创建 Compute 客户端
+func createComputeClient() (*gophercloud.ServiceClient, error) {
+	provider, err := getProviderClient()
 	if err != nil {
-		log.Println("Failed to create OpenStack client:", err)
-		return
+		return nil, err
 	}
 
-	// computeClient
-	computeClient, err := openstack.NewComputeV2(provider, gophercloud.EndpointOpts{
-		Region: Region,
-		Name:   "nova",
-		Type:   "compute",
+	return openstack.NewComputeV2(provider, gophercloud.EndpointOpts{
+		Region: config.Region,
 	})
-	if err != nil {
-		log.Println("Failed to create compute service client:", err)
-		return
-	}
-	// 将computeClient传递给需要使用的服务函数
-	services.SetComputeClient(computeClient)
+}
 
-	// volumeClient
-	volumeClient, err := openstack.NewBlockStorageV2(provider, gophercloud.EndpointOpts{
-		Region: Region,
-		Name:   "cinderv2",
-		Type:   "volumev2",
+// createVolumeClientV1 创建 Volume V1 客户端
+func createVolumeClientV1() (*gophercloud.ServiceClient, error) {
+	provider, err := getProviderClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return openstack.NewBlockStorageV1(provider, gophercloud.EndpointOpts{
+		Region: config.Region,
 	})
-	if err != nil {
-		log.Println("Failed to create volume service client:", err)
-		return
-	}
-	services.SetVolumeClient(volumeClient)
+}
 
-	// networkClient
-	networkClient, err := openstack.NewNetworkV2(provider, gophercloud.EndpointOpts{
-		Region: Region,
-		Name:   "neutron",
-		Type:   "network",
+// createVolumeClientV2 创建 Volume V2 客户端
+func createVolumeClientV2() (*gophercloud.ServiceClient, error) {
+	provider, err := getProviderClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return openstack.NewBlockStorageV2(provider, gophercloud.EndpointOpts{
+		Region: config.Region,
 	})
-	if err != nil {
-		log.Println("Failed to create network service client:", err)
-		return
-	}
-	services.SetNetworkClient(networkClient)
+}
 
+// createVolumeClientV3 创建 Volume V3 客户端
+func createVolumeClientV3() (*gophercloud.ServiceClient, error) {
+	provider, err := getProviderClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return openstack.NewBlockStorageV3(provider, gophercloud.EndpointOpts{
+		Region: config.Region,
+	})
+}
+
+// createNetworkClient 创建 Network 客户端
+func createNetworkClient() (*gophercloud.ServiceClient, error) {
+	provider, err := getProviderClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return openstack.NewNetworkV2(provider, gophercloud.EndpointOpts{
+		Region: config.Region,
+	})
+}
+
+// Init 初始化 OpenStack 客户端
+func Init() {
+	loadConfig()
+}
+
+// GetComputeClient 获取 Compute 客户端
+func GetComputeClient() (*gophercloud.ServiceClient, error) {
+	return createComputeClient()
+}
+
+// GetVolumeClientV1 获取 Volume V1 客户端
+func GetVolumeClientV1() (*gophercloud.ServiceClient, error) {
+	return createVolumeClientV1()
+}
+
+// GetVolumeClientV2 获取 Volume V2 客户端
+func GetVolumeClientV2() (*gophercloud.ServiceClient, error) {
+	return createVolumeClientV2()
+}
+
+// GetVolumeClientV3 获取 Volume V3 客户端
+func GetVolumeClientV3() (*gophercloud.ServiceClient, error) {
+	return createVolumeClientV3()
+}
+
+// GetNetworkClient 获取 Network 客户端
+func GetNetworkClient() (*gophercloud.ServiceClient, error) {
+	return createNetworkClient()
 }
