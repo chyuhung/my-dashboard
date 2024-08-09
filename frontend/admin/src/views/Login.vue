@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <div class="logo">
+      <h1>OpenStack</h1>
+    </div>
     <div class="loginBox">
       <a-form-model
         ref="loginFormRef"
@@ -7,34 +10,28 @@
         :model="formdata"
         class="loginForm"
       >
-        <!-- 用户名输入框 -->
         <a-form-model-item prop="username">
-          <a-input v-model="formdata.username" placeholder="用户名">
-            <a-icon
-              slot="prefix"
-              type="user"
-              style="color: rgba(0, 0, 0, 0.25)"
-          /></a-input>
+          <a-input
+            v-model="formdata.username"
+            placeholder="请输入用户名"
+            class="inputField"
+          >
+            <a-icon slot="prefix" type="user" class="inputIcon" />
+          </a-input>
         </a-form-model-item>
-        <!-- 密码输入框 -->
         <a-form-model-item prop="password">
           <a-input
             v-model="formdata.password"
-            placeholder="密码"
+            placeholder="请输入密码"
             type="password"
+            class="inputField"
           >
-            <a-icon
-              slot="prefix"
-              type="lock"
-              style="color: rgba(0, 0, 0, 0.25)"
-          /></a-input>
+            <a-icon slot="prefix" type="lock" class="inputIcon" />
+          </a-input>
         </a-form-model-item>
         <a-form-model-item class="loginBtn">
-          <!-- 登录和取消按钮 -->
-          <a-button type="primary" style="margin: 10px" @click="login"
-            >登录</a-button
-          >
-          <a-button type="info" style="margin: 10px" @click="resetForm"
+          <a-button type="primary" @click="login" class="btn">登录</a-button>
+          <a-button type="default" @click="resetForm" class="btn"
             >取消</a-button
           >
         </a-form-model-item>
@@ -73,25 +70,10 @@ export default {
       }
     }
   },
-  mounted() {
-    const handleKeyPress = (event) => {
-      if (event.key === 'Enter') {
-        this.login()
-      }
-    }
-    window.addEventListener('keydown', handleKeyPress)
-    // 在组件实例上存储处理函数的引用，以便在销毁时使用
-    this._handleKeyPress = handleKeyPress
-  },
-  beforeDestroy() {
-    // 移除键盘事件监听
-    window.removeEventListener('keydown', this._handleKeyPress)
-  },
   methods: {
     resetForm() {
       this.$refs.loginFormRef.resetFields()
     },
-
     login() {
       this.$refs.loginFormRef.validate(async (valid) => {
         if (!valid) return this.$message.error('输入不合规，请按要求修改')
@@ -109,24 +91,61 @@ export default {
 <style scoped>
 .container {
   height: 100%;
-  background-color: rgba(218, 218, 218, 0.687);
-}
-.loginBox {
-  width: 450px;
-  height: 300px;
-  background-color: rgb(255, 255, 255);
-  position: absolute;
-  top: 50%;
-  left: 70%;
-  transform: translate(-50%, -50%);
-  border-radius: 9px;
+  background-color: #f0f2f5; /* 轻灰色背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.loginForm {
-  width: 100%;
-  position: absolute;
-  bottom: 10%;
-  padding: 0% 20%;
+.logo {
+  text-align: center;
+  margin-right: 50px;
+}
+
+.logo h1 {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.loginBox {
+  width: 450px;
+  background-color: #ffffff; /* 白色背景 */
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 更柔和的阴影 */
+  padding: 30px; /* 内边距 */
   box-sizing: border-box;
+}
+
+.inputField {
+  border-radius: 5px; /* 输入框圆角 */
+  border: 1px solid #d9d9d9; /* 边框颜色 */
+  transition: border-color 0.3s; /* 边框颜色过渡 */
+}
+
+.inputField:focus {
+  border-color: #40a9ff; /* 聚焦时边框颜色 */
+  box-shadow: 0 0 5px rgba(64, 169, 255, 0.5); /* 聚焦时阴影 */
+}
+
+.inputIcon {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.btn {
+  width: 100%; /* 按钮宽度 */
+  margin: 10px 0; /* 按钮间距 */
+  border-radius: 5px; /* 按钮圆角 */
+}
+
+.btn:first-child {
+  background-color: #1890ff; /* 登录按钮颜色 */
+  color: white; /* 字体颜色 */
+}
+
+.btn:last-child {
+  background-color: #f5f5f5; /* 取消按钮颜色 */
+  color: #595959; /* 字体颜色 */
 }
 </style>

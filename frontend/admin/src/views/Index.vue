@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="title">
-      <h1 class="title">mydashboard</h1>
+      <h1>mydashboard</h1>
     </div>
     <div class="searchBox">
       <a-input
@@ -16,11 +16,11 @@
         @pressEnter="search"
         style="width: 300px"
       />
-      <a-button type="primary" @click="search" style="margin-left: 10px"
-        >搜索</a-button
-      >
+      <a-button type="primary" @click="search" style="margin-left: 10px">
+        搜索
+      </a-button>
     </div>
-    <div class="searchResults" v-if="searchResults">
+    <div class="searchResults" v-if="searchResults.length">
       <table>
         <thead>
           <tr>
@@ -28,22 +28,21 @@
             <th>主机</th>
             <th>规格</th>
             <th>镜像</th>
+            <th>操作</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>{{ searchResults.name }}</td>
-            <td>{{ searchResults.host }}</td>
-            <td>{{ searchResults.flavor }}</td>
-            <td>{{ searchResults.image }}</td>
-            <td>
-              <a-button type="primary" @click="reinstall(searchResults)"
-                >重装</a-button
-              >
-            </td>
+          <tr v-for="server in searchResults" :key="server.id">
+            <td>{{ server.name }}</td>
+            <td>{{ server.host }}</td>
+            <td>{{ server.flavor }}</td>
+            <td>{{ server.image }}</td>
           </tr>
         </tbody>
       </table>
+    </div>
+    <div v-else class="no-results">
+      <p>未找到相关服务器</p>
     </div>
   </div>
 </template>
@@ -53,24 +52,33 @@ export default {
   data() {
     return {
       searchText: '',
-      searchResults: null
+      searchResults: []
     }
   },
   methods: {
     logout() {
-      window.sessionStorage.clear('token')
+      window.sessionStorage.clear()
       this.$router.push('/login')
     },
     async search() {
+      if (!this.searchText) {
+        this.$message.warning('查询参数不能为空')
+        return
+      }
       try {
-        const { data } = await this.$http.get(`instance/${this.searchText}`)
+        const response = await this.$http.get(
+          `servers/search?query=${this.searchText}`
+        )
+        const data = response.data
+
         if (data.message) {
           this.$message.error(data.message)
         } else {
-          this.searchResults = data.data
+          this.searchResults = data.servers || []
         }
       } catch (error) {
         console.error(error)
+        this.$message.error('搜索服务器时出错')
       }
     }
   }
@@ -96,18 +104,25 @@ export default {
 }
 
 .title {
-  font-size: 90px;
+  font-size: 48px;
   font-weight: bold;
-  margin-bottom: 7%;
+  margin-bottom: 2rem;
   font-family: 'Courier New', Courier, monospace;
 }
 
 .searchBox {
   display: flex;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .searchResults {
   margin-top: 20px;
+  width: 100%;
+}
+
+.no-results {
+  margin-top: 20px;
+  color: red;
 }
 </style>
