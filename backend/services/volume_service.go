@@ -7,6 +7,7 @@ import (
 	"github.com/chyuhung/my-dashboard/config"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumes"
+	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumetypes"
 )
 
 var volumeClientV2 *gophercloud.ServiceClient
@@ -48,4 +49,17 @@ func CreateVolume(opts volumes.CreateOpts) (*volumes.Volume, error) {
 		return &volumes.Volume{}, errors.New("failed to create volume")
 	}
 	return volume, nil
+}
+
+// GetVolumeTypes 获取可用的卷类型
+func GetVolumeTypes() ([]volumetypes.VolumeType, error) {
+	allPages, err := volumetypes.List(volumeClientV2).AllPages()
+	if err != nil {
+		return nil, errors.New("failed to list volume types")
+	}
+	allTypes, err := volumetypes.ExtractVolumeTypes(allPages)
+	if err != nil {
+		return nil, errors.New("failed to extract volume types from pages")
+	}
+	return allTypes, nil
 }

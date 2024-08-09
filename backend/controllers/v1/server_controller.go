@@ -1,15 +1,25 @@
 package v1
 
 import (
-	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/chyuhung/my-dashboard/models"
 	"github.com/chyuhung/my-dashboard/services"
 	"github.com/gin-gonic/gin"
 	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumes"
 )
+
+func GetServersHandler(c *gin.Context) {
+	// 获取所有server
+	servers, err := services.GetServers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "无法获取服务器列表",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, servers)
+}
 
 func CreateServerHandler(c *gin.Context) {
 	// 绑定json数据到结构体
@@ -54,8 +64,9 @@ func CreateServerHandler(c *gin.Context) {
 	// 添加随机字符串后缀5位，保证名称唯一
 	for _, v := range csr.Volumes {
 		suffix := GenerateRandomString(5)
+		// 需要动态交互获取创建volume的必要信息
 		opts := volumes.CreateOpts{Size: v.Size, Name: csr.Hostname + "-datavol-" + suffix}
-		volume, err := services.CreateVolume(opts)
+		_, err := services.CreateVolume(opts)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": "创建volume失败",
@@ -71,13 +82,22 @@ func CreateServerHandler(c *gin.Context) {
 	}
 }
 
-// GenerateRandomString 生成一个指定长度的随机字符串
-func GenerateRandomString(length int) string {
-	rand.Seed(time.Now().UnixNano())
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	result := make([]byte, length)
-	for i := 0; i < length; i++ {
-		result[i] = charset[rand.Intn(len(charset))]
+// SearchServersHandler 通过名称或 IP 地址搜索服务器
+func SearchServersHandler(c *gin.Context) {
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "查询参数不能为空"})
+		return
 	}
-	return string(result)
+
+	servers, err := services.SearchServers(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "搜索服务器失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, servers)
 }
