@@ -20,6 +20,11 @@ type Config struct {
 
 var config Config
 
+// Init 初始化 OpenStack 客户端
+func init() {
+	loadConfig()
+}
+
 // loadConfig 加载环境变量配置
 func loadConfig() {
 	viper.AutomaticEnv()
@@ -113,11 +118,6 @@ func createNetworkClient() (*gophercloud.ServiceClient, error) {
 	return openstack.NewNetworkV2(provider, gophercloud.EndpointOpts{
 		Region: config.Region,
 	})
-}
-
-// Init 初始化 OpenStack 客户端
-func Init() {
-	loadConfig()
 }
 
 // GetComputeClient 获取 Compute 客户端
