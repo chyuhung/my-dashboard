@@ -25,3 +25,22 @@ func GetVolumeTypesHandler(c *gin.Context) {
 		"data":    volumeTypes,
 	})
 }
+
+func GetVolumesHandler(c *gin.Context) {
+	vl, err := services.GetVolumes()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "获取卷列表失败",
+			"err":     err.Error(),
+		})
+		return
+	}
+	var volumes []string
+	for _, v := range vl {
+		volumes = append(volumes, v.Name)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "获取卷列表成功",
+		"data":    vl,
+	})
+}

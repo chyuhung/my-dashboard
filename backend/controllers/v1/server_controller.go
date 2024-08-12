@@ -6,7 +6,7 @@ import (
 	"github.com/chyuhung/my-dashboard/models"
 	"github.com/chyuhung/my-dashboard/services"
 	"github.com/gin-gonic/gin"
-	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumes"
+	"github.com/gophercloud/gophercloud/openstack/blockstorage/v2/volumes"
 )
 
 func GetServersHandler(c *gin.Context) {

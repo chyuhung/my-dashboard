@@ -20,6 +20,7 @@ func Setup() {
 		auth.GET("/volumetypes", v1.GetVolumeTypesHandler) // 获取卷类型
 		auth.GET("/networks", v1.GetNetworksHandler)       // 获取网络
 		auth.GET("/servers", v1.GetServersHandler)         // 获取服务器列表
+		auth.GET("/volumes", v1.GetVolumesHandler)         // 获取卷列表
 
 		auth.GET("/servers/search", v1.SearchServersHandler) // 搜索 Server
 	}

@@ -6,8 +6,8 @@ import (
 
 	"github.com/chyuhung/my-dashboard/config"
 	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumes"
 	"github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumetypes"
+	"github.com/gophercloud/gophercloud/openstack/blockstorage/v2/volumes"
 )
 
 var volumeClientV2 *gophercloud.ServiceClient
@@ -62,4 +62,25 @@ func GetVolumeTypes() ([]volumetypes.VolumeType, error) {
 		return nil, errors.New("failed to extract volume types from pages")
 	}
 	return allTypes, nil
+}
+
+func GetVolumes() ([]volumes.Volume, error) {
+	opts := &volumes.ListOpts{
+		AllTenants: true,
+		Limit:      99999,
+	}
+
+	allPages, err := volumes.List(volumeClientV2, opts).AllPages()
+	if err != nil {
+
+		return nil, errors.New("failed to list volumes")
+
+	}
+	allVolumes, err := volumes.ExtractVolumes(allPages)
+	if err != nil {
+
+		return nil, errors.New("failed to extract volumes from pages")
+
+	}
+	return allVolumes, nil
 }
