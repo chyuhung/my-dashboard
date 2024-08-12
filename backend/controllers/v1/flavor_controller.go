@@ -8,7 +8,7 @@ import (
 )
 
 func GetFlavorsHandler(c *gin.Context) {
-	flavors, err := services.GetFlavors()
+	fvs, err := services.GetFlavors()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取flavor失败",
@@ -16,5 +16,12 @@ func GetFlavorsHandler(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, flavors)
+	var flavors []string
+	for _, fv := range fvs {
+		flavors = append(flavors, fv.Name)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "获取flavor成功",
+		"data":    flavors,
+	})
 }

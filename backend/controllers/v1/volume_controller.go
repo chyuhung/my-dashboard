@@ -8,7 +8,7 @@ import (
 )
 
 func GetVolumeTypesHandler(c *gin.Context) {
-	volumeTypes, err := services.GetVolumeTypes()
+	vts, err := services.GetVolumeTypes()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取卷类型失败",
@@ -16,5 +16,12 @@ func GetVolumeTypesHandler(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, volumeTypes)
+	var volumeTypes []string
+	for _, vt := range vts {
+		volumeTypes = append(volumeTypes, vt.Name)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "获取卷类型成功",
+		"data":    volumeTypes,
+	})
 }

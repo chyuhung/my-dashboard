@@ -99,5 +99,8 @@ func SearchServersHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, servers)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "搜索成功",
+		"data":    servers,
+	})
 }

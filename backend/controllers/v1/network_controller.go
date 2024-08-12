@@ -8,7 +8,7 @@ import (
 )
 
 func GetNetworksHandler(c *gin.Context) {
-	networks, err := services.GetNetworks()
+	nets, err := services.GetNetworks()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取network失败",
@@ -16,5 +16,12 @@ func GetNetworksHandler(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, networks)
+	var networks []string
+	for _, net := range nets {
+		networks = append(networks, net.Name)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "获取network成功",
+		"data":    networks,
+	})
 }
