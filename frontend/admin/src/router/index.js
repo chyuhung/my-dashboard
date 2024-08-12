@@ -2,11 +2,12 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Index from '../views/Index'
 import Login from '../views/Login'
+import Servers from '../views/Servers'
 
-// 页面组件
-
+// 使用 VueRouter
 Vue.use(VueRouter)
 
+// 定义路由
 const routes = [
   {
     path: '/login',
@@ -16,22 +17,35 @@ const routes = [
   {
     path: '/index',
     name: 'index',
-    component: Index
+    component: Index,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/servers',
+    name: 'servers',
+    component: Servers,
+    meta: { requiresAuth: true }
   }
 ]
 
+// 创建路由实例
 const router = new VueRouter({
   routes
 })
 
-router.beforeEach(async (to, from, next) => {
+// 路由守卫
+router.beforeEach((to, from, next) => {
   const token = window.sessionStorage.getItem('token')
+
+  // 允许访问登录页面
   if (to.path === '/login') return next()
-  if (!token && to.path === '/index') {
-    next('/login')
-  } else {
-    next()
+
+  // 如果需要认证且未登录，重定向到登录页
+  if (to.matched.some((record) => record.meta.requiresAuth) && !token) {
+    return next('/login')
   }
+
+  next()
 })
 
 export default router

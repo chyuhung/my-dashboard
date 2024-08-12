@@ -2,7 +2,7 @@
   <div class="container">
     <div class="topBar">
       <div class="spacer">
-        <a-button type="primary" @click="logout">退出</a-button>
+        <a-button type="default" @click="logout">退出</a-button>
       </div>
     </div>
     <div class="title">
@@ -14,11 +14,9 @@
         placeholder="输入虚拟机IP或名称进行搜索"
         suffix-icon="search"
         @pressEnter="search"
-        style="width: 300px"
+        class="inputField"
       />
-      <a-button type="primary" @click="search" style="margin-left: 10px">
-        搜索
-      </a-button>
+      <a-button type="primary" @click="search" class="btn">搜索</a-button>
     </div>
     <div class="searchResults" v-if="searchResults.length">
       <table>
@@ -37,6 +35,11 @@
             <td>{{ server.host }}</td>
             <td>{{ server.flavor }}</td>
             <td>{{ server.image }}</td>
+            <td>
+              <a-button type="link" @click="handleAction(server.id)"
+                >操作</a-button
+              >
+            </td>
           </tr>
         </tbody>
       </table>
@@ -67,19 +70,23 @@ export default {
       }
       try {
         const response = await this.$http.get(
-          `servers/search?query=${this.searchText}`
+          `servers/search?query=${encodeURIComponent(this.searchText)}`
         )
         const data = response.data
 
         if (data.message) {
           this.$message.error(data.message)
         } else {
-          this.searchResults = data.servers || []
+          this.searchResults = data.data || []
         }
       } catch (error) {
         console.error(error)
         this.$message.error('搜索服务器时出错')
       }
+    },
+    handleAction(serverId) {
+      // 处理操作逻辑
+      console.log(`操作服务器 ID: ${serverId}`)
     }
   }
 }
@@ -90,6 +97,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #f0f2f5;
+  padding: 20px;
+  min-height: 100vh;
 }
 
 .topBar {
@@ -106,7 +116,7 @@ export default {
 .title {
   font-size: 48px;
   font-weight: bold;
-  margin-bottom: 2rem;
+  margin: 2rem 0;
   font-family: 'Courier New', Courier, monospace;
 }
 
@@ -114,6 +124,22 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.inputField {
+  border-radius: 5px;
+  border: 1px solid #d9d9d9;
+  transition: border-color 0.3s;
+}
+
+.inputField:focus {
+  border-color: #40a9ff;
+  box-shadow: 0 0 5px rgba(64, 169, 255, 0.5);
+}
+
+.btn {
+  margin-left: 10px;
+  border-radius: 5px;
 }
 
 .searchResults {

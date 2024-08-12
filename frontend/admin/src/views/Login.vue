@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" @keydown.enter="login">
     <div class="logo">
       <h1>OpenStack</h1>
     </div>
@@ -91,7 +91,7 @@ export default {
 <style scoped>
 .container {
   height: 100%;
-  background-color: #f0f2f5; /* 轻灰色背景 */
+  background-color: #f0f2f5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,22 +111,22 @@ export default {
 
 .loginBox {
   width: 450px;
-  background-color: #ffffff; /* 白色背景 */
+  background-color: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 更柔和的阴影 */
-  padding: 30px; /* 内边距 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
   box-sizing: border-box;
 }
 
 .inputField {
-  border-radius: 5px; /* 输入框圆角 */
-  border: 1px solid #d9d9d9; /* 边框颜色 */
-  transition: border-color 0.3s; /* 边框颜色过渡 */
+  border-radius: 5px;
+  border: 1px solid #d9d9d9;
+  transition: border-color 0.3s;
 }
 
 .inputField:focus {
-  border-color: #40a9ff; /* 聚焦时边框颜色 */
-  box-shadow: 0 0 5px rgba(64, 169, 255, 0.5); /* 聚焦时阴影 */
+  border-color: #40a9ff;
+  box-shadow: 0 0 5px rgba(64, 169, 255, 0.5);
 }
 
 .inputIcon {
@@ -134,18 +134,18 @@ export default {
 }
 
 .btn {
-  width: 100%; /* 按钮宽度 */
-  margin: 10px 0; /* 按钮间距 */
-  border-radius: 5px; /* 按钮圆角 */
+  width: 100%;
+  margin: 10px 0;
+  border-radius: 5px;
 }
 
 .btn:first-child {
-  background-color: #1890ff; /* 登录按钮颜色 */
-  color: white; /* 字体颜色 */
+  background-color: #1890ff;
+  color: white;
 }
 
 .btn:last-child {
-  background-color: #f5f5f5; /* 取消按钮颜色 */
-  color: #595959; /* 字体颜色 */
+  background-color: #f5f5f5;
+  color: #595959;
 }
 </style>
