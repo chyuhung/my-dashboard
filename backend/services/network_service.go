@@ -45,9 +45,9 @@ func GetNetworks() ([]networks.Network, error) {
 	opts := networks.ListOpts{
 		Limit: 99999,
 	}
-	allPages, err := networks.List(computeClient, opts).AllPages()
+	allPages, err := networks.List(networkClient, opts).AllPages()
 	if err != nil {
-		return []networks.Network{}, errors.New("failed to get all networks")
+		return []networks.Network{}, err
 	}
 
 	allNetworks, err := networks.ExtractNetworks(allPages)
