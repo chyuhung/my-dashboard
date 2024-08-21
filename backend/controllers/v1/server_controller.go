@@ -10,18 +10,36 @@ import (
 )
 
 func GetServersHandler(c *gin.Context) {
-	// 获取所有server
-	servers, err := services.GetServers()
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "查询参数不能为空"})
+		return
+	}
+
+	servers, err := services.SearchServers(query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "无法获取服务器列表",
+			"message": "搜索实例失败",
+			"error":   err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, servers)
+	// TODO: 转换成model.Server
+	var svs []models.CreateServerRequest
+	for _, s := range servers {
+		svs = append(svs, models.CreateServerRequest{
+			Hostname: s.Name,
+			//Flavor:   s.Flavor,
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "搜索成功",
+		"data":    servers,
+	})
+
 }
 
-func CreateServerHandler(c *gin.Context) {
+func CreateServersHandler(c *gin.Context) {
 	// 绑定json数据到结构体
 	var csr models.CreateServerRequest
 	if err := c.ShouldBindJSON(csr); err != nil {
@@ -84,23 +102,5 @@ func CreateServerHandler(c *gin.Context) {
 
 // SearchServersHandler 通过名称或 IP 地址搜索服务器
 func SearchServersHandler(c *gin.Context) {
-	query := c.Query("query")
-	if query == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "查询参数不能为空"})
-		return
-	}
 
-	servers, err := services.SearchServers(query)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "搜索服务器失败",
-			"error":   err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "搜索成功",
-		"data":    servers,
-	})
 }
