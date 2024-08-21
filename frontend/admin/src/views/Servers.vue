@@ -5,6 +5,9 @@
       <div v-if="step === 1" class="step">
         <label for="hostname">主机名:</label>
         <input type="text" v-model="hostname" required class="inputField" />
+        <button type="button" @click="checkHostname" class="btn">
+          检查主机名
+        </button>
         <button type="button" @click="nextStep" class="btn">下一步</button>
       </div>
 
@@ -15,6 +18,7 @@
             {{ image }}
           </option>
         </select>
+        <button type="button" @click="checkImage" class="btn">检查镜像</button>
         <button type="button" @click="prevStep" class="btn">上一步</button>
         <button type="button" @click="nextStep" class="btn">下一步</button>
       </div>
@@ -26,6 +30,7 @@
             {{ flavor }}
           </option>
         </select>
+        <button type="button" @click="checkFlavor" class="btn">检查规格</button>
         <button type="button" @click="prevStep" class="btn">上一步</button>
         <button type="button" @click="nextStep" class="btn">下一步</button>
       </div>
@@ -37,6 +42,9 @@
             {{ type }}
           </option>
         </select>
+        <button type="button" @click="checkVolumeType" class="btn">
+          检查卷类型
+        </button>
         <button type="button" @click="prevStep" class="btn">上一步</button>
         <button type="button" @click="nextStep" class="btn">下一步</button>
       </div>
@@ -48,12 +56,20 @@
             {{ network }}
           </option>
         </select>
+        <button type="button" @click="checkNetwork" class="btn">
+          检查网络
+        </button>
         <button type="button" @click="prevStep" class="btn">上一步</button>
         <button type="button" @click="submit" class="btn submitBtn">
           创建服务器
         </button>
       </div>
     </form>
+
+    <div class="result">
+      <h2>检查结果:</h2>
+      <p>{{ checkResult }}</p>
+    </div>
   </div>
 </template>
 
@@ -72,7 +88,8 @@ export default {
       images: [],
       flavors: [],
       volumeTypes: [],
-      networks: []
+      networks: [],
+      checkResult: ''
     }
   },
   mounted() {
@@ -105,6 +122,56 @@ export default {
     async fetchNetworks() {
       const response = await axios.get('/networks')
       this.networks = response.data.data
+    },
+    async checkHostname() {
+      try {
+        const response = await axios.get(
+          `/check/hostname?name=${this.hostname}`
+        )
+        this.checkResult = response.data.message
+      } catch (error) {
+        this.checkResult = '检查主机名失败'
+      }
+    },
+    async checkImage() {
+      try {
+        const response = await axios.get(
+          `/check/image?image=${this.selectedImage}`
+        )
+        this.checkResult = response.data.message
+      } catch (error) {
+        this.checkResult = '检查镜像失败'
+      }
+    },
+    async checkFlavor() {
+      try {
+        const response = await axios.get(
+          `/check/flavor?flavor=${this.selectedFlavor}`
+        )
+        this.checkResult = response.data.message
+      } catch (error) {
+        this.checkResult = '检查规格失败'
+      }
+    },
+    async checkVolumeType() {
+      try {
+        const response = await axios.get(
+          `/check/volume?type=${this.selectedVolumeType}`
+        )
+        this.checkResult = response.data.message
+      } catch (error) {
+        this.checkResult = '检查卷类型失败'
+      }
+    },
+    async checkNetwork() {
+      try {
+        const response = await axios.get(
+          `/check/network?network=${this.selectedNetwork}`
+        )
+        this.checkResult = response.data.message
+      } catch (error) {
+        this.checkResult = '检查网络失败'
+      }
     },
     async submit() {
       const serverData = {
@@ -205,5 +272,15 @@ label {
 
 .submitBtn:hover {
   background-color: #73d13d;
+}
+
+.result {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 </style>
