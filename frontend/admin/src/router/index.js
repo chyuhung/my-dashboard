@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Index from '../views/Index'
 import Login from '../views/Login'
+import Create from '../views/Create'
 import Servers from '../views/Servers'
 
 // 使用 VueRouter
@@ -15,15 +15,15 @@ const routes = [
     component: Login
   },
   {
-    path: '/index',
-    name: 'index',
-    component: Index,
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/servers',
     name: 'servers',
     component: Servers,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/create',
+    name: 'create',
+    component: Create,
     meta: { requiresAuth: true }
   }
 ]
