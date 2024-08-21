@@ -125,9 +125,7 @@ export default {
     },
     async checkHostname() {
       try {
-        const response = await axios.get(
-          `/check/hostname?name=${this.hostname}`
-        )
+        const response = await axios.get(`/check/server?query=${this.hostname}`)
         this.checkResult = response.data.message
       } catch (error) {
         this.checkResult = '检查主机名失败'
@@ -136,7 +134,7 @@ export default {
     async checkImage() {
       try {
         const response = await axios.get(
-          `/check/image?image=${this.selectedImage}`
+          `/check/image?query=${this.selectedImage}`
         )
         this.checkResult = response.data.message
       } catch (error) {
@@ -146,7 +144,7 @@ export default {
     async checkFlavor() {
       try {
         const response = await axios.get(
-          `/check/flavor?flavor=${this.selectedFlavor}`
+          `/check/flavor?query=${this.selectedFlavor}`
         )
         this.checkResult = response.data.message
       } catch (error) {
@@ -156,7 +154,7 @@ export default {
     async checkVolumeType() {
       try {
         const response = await axios.get(
-          `/check/volume?type=${this.selectedVolumeType}`
+          `/check/volumetype?query=${this.selectedVolumeType}`
         )
         this.checkResult = response.data.message
       } catch (error) {
@@ -166,7 +164,7 @@ export default {
     async checkNetwork() {
       try {
         const response = await axios.get(
-          `/check/network?network=${this.selectedNetwork}`
+          `/check/network?query=${this.selectedNetwork}`
         )
         this.checkResult = response.data.message
       } catch (error) {
