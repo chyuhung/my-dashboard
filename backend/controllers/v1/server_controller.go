@@ -34,12 +34,12 @@ func GetServersHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "搜索成功",
-		"data":    servers,
+		"data":    svs,
 	})
 
 }
 
-func CreateServersHandler(c *gin.Context) {
+func CreateHandler(c *gin.Context) {
 	// 绑定json数据到结构体
 	var csr models.CreateServerRequest
 	if err := c.ShouldBindJSON(csr); err != nil {
@@ -100,7 +100,32 @@ func CreateServersHandler(c *gin.Context) {
 	}
 }
 
-// SearchServersHandler 通过名称或 IP 地址搜索服务器
-func SearchServersHandler(c *gin.Context) {
+// CheckServerHandler 检查服务器
+func CheckServerHandler(c *gin.Context) {
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "查询参数不能为空"})
+		return
+	}
 
+	servers, err := services.SearchServers(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "搜索实例失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	for _, s := range servers {
+		if s.Name == query {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "名称不可用",
+			})
+			return
+		}
+
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "名称可用",
+	})
 }

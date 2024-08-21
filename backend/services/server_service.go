@@ -128,3 +128,18 @@ func SearchServers(query string) ([]servers.Server, error) {
 	}
 	return filteredServers, nil
 }
+
+// SearchFlavors 根据名称搜索服务器
+func SearchFlavors(query string) ([]flavors.Flavor, error) {
+	fvs, err := GetFlavors()
+	if err != nil {
+		return nil, err
+	}
+	var filteredFlavors []flavors.Flavor
+	for _, flavor := range fvs {
+		if strings.Contains(flavor.Name, query) {
+			filteredFlavors = append(filteredFlavors, flavor)
+		}
+	}
+	return filteredFlavors, nil
+}

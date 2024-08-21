@@ -25,3 +25,32 @@ func GetFlavorsHandler(c *gin.Context) {
 		"data":    flavors,
 	})
 }
+
+func CheckFlavorHandler(c *gin.Context) {
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "查询参数不能为空"})
+		return
+	}
+
+	flavors, err := services.SearchFlavors(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "搜索失败",
+			"error":   err.Error(),
+		})
+		return
+	}
+	for _, f := range flavors {
+		if f.Name == query {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "规格可用",
+			})
+			return
+		}
+
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "规格不可用",
+	})
+}

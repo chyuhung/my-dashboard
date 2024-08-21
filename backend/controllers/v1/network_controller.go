@@ -25,3 +25,33 @@ func GetNetworksHandler(c *gin.Context) {
 		"data":    networks,
 	})
 }
+
+func CheckNetworkHandler(c *gin.Context) {
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "查询参数不能为空",
+		})
+		return
+	}
+	nets, err := services.GetNetworks()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "获取网络列表失败",
+			"err":     err.Error(),
+		})
+		return
+	}
+	for _, net := range nets {
+		if net.Name == query {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "网络可用",
+				"data":    net,
+			})
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{
+		"message": "网络不可用",
+	})
+}
