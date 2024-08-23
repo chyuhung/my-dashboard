@@ -36,7 +36,7 @@ func CheckFlavorHandler(c *gin.Context) {
 	flavors, err := services.GetFlavors()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "搜索失败",
+			"message": "获取规格列表失败",
 			"error":   err,
 		})
 		return

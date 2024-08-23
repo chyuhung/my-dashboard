@@ -27,7 +27,7 @@ func GetVolumeTypesHandler(c *gin.Context) {
 }
 
 func GetVolumesHandler(c *gin.Context) {
-	vl, err := services.GetVolumes()
+	vls, err := services.GetVolumes()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取卷列表失败",
@@ -36,12 +36,12 @@ func GetVolumesHandler(c *gin.Context) {
 		return
 	}
 	var volumes []string
-	for _, v := range vl {
+	for _, v := range vls {
 		volumes = append(volumes, v.Name)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "获取卷列表成功",
-		"data":    vl,
+		"data":    volumes,
 	})
 }
 
@@ -56,7 +56,7 @@ func CheckVolumeTypeHandler(c *gin.Context) {
 	vts, err := services.GetVolumeTypes()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "获取卷类型失败",
+			"message": "获取卷类型列表失败",
 			"err":     err,
 		})
 		return

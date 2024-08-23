@@ -111,7 +111,7 @@ func CheckServerHandler(c *gin.Context) {
 	servers, err := services.GetServers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "搜索实例失败",
+			"message": "获取主机名列表败",
 			"error":   err,
 		})
 		return
@@ -119,12 +119,12 @@ func CheckServerHandler(c *gin.Context) {
 	for _, s := range servers {
 		if s.Name == query {
 			c.JSON(http.StatusOK, gin.H{
-				"message": "名称不可用",
+				"message": "主机名不可用",
 			})
 			return
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "名称可用",
+		"message": "主机名可用",
 	})
 }

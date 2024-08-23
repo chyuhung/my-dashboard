@@ -37,7 +37,7 @@ func CheckImageHandler(c *gin.Context) {
 	imgs, err := services.GetImages()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "获取镜像失败",
+			"message": "获取镜像列表失败",
 			"err":     err,
 		})
 		return
