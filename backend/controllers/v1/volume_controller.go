@@ -67,9 +67,9 @@ func CheckVolumeTypeHandler(c *gin.Context) {
 				"message": "卷类型可用",
 			})
 		}
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "卷类型不可用",
 	})
-
 }
