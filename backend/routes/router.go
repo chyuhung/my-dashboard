@@ -21,7 +21,6 @@ func Setup() {
 		auth.GET("/flavors", v1.GetFlavorsHandler)         // 获取规格
 		auth.GET("/volumetypes", v1.GetVolumeTypesHandler) // 获取卷类型
 		auth.GET("/networks", v1.GetNetworksHandler)       // 获取网络
-		auth.GET("/servers", v1.GetServersHandler)         // 获取实例（部分）
 		auth.GET("/volumes", v1.GetVolumesHandler)         // 获取卷列表
 		// 检查
 		auth.GET("/check/server", v1.CheckServerHandler)         // 获取实例详情
@@ -29,7 +28,8 @@ func Setup() {
 		auth.GET("/check/flavor", v1.CheckFlavorHandler)         // 获取规格详情
 		auth.GET("/check/network", v1.CheckNetworkHandler)       // 获取网络详情
 		auth.GET("/check/image", v1.CheckImageHandler)           // 获取镜像详情
-
+		// 指定查询
+		auth.GET("/servers", v1.GetServersHandler) // 获取实例（部分）
 	}
 
 	// 无需认证的路由
