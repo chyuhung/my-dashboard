@@ -84,17 +84,3 @@ func GetVolumes() ([]volumes.Volume, error) {
 	}
 	return allVolumes, nil
 }
-
-func SearchVolumeTypes(name string) ([]volumetypes.VolumeType, error) {
-	vts, err := GetVolumeTypes()
-	if err != nil {
-		return nil, err
-	}
-	var filteredVolumeTypes []volumetypes.VolumeType
-	for _, vt := range vts {
-		if vt.Name == name {
-			filteredVolumeTypes = append(filteredVolumeTypes, vt)
-		}
-	}
-	return filteredVolumeTypes, nil
-}

@@ -12,7 +12,7 @@ func GetNetworksHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取network失败",
-			"err":     err.Error(),
+			"err":     err,
 		})
 		return
 	}
@@ -38,7 +38,7 @@ func CheckNetworkHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取网络列表失败",
-			"err":     err.Error(),
+			"err":     err,
 		})
 		return
 	}

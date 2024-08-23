@@ -16,11 +16,11 @@ func GetServersHandler(c *gin.Context) {
 		return
 	}
 
-	servers, err := services.SearchServers(query)
+	servers, err := services.GetServers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "搜索实例失败",
-			"error":   err.Error(),
+			"error":   err,
 		})
 		return
 	}
@@ -88,7 +88,7 @@ func CreateHandler(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": "创建volume失败",
-				"err":     err.Error(),
+				"err":     err,
 			})
 			return
 			// 创建volume
@@ -108,11 +108,11 @@ func CheckServerHandler(c *gin.Context) {
 		return
 	}
 
-	servers, err := services.SearchServers(query)
+	servers, err := services.GetServers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "搜索实例失败",
-			"error":   err.Error(),
+			"error":   err,
 		})
 		return
 	}
@@ -123,7 +123,6 @@ func CheckServerHandler(c *gin.Context) {
 			})
 			return
 		}
-
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "名称可用",

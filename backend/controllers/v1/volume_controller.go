@@ -12,7 +12,7 @@ func GetVolumeTypesHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "搜索卷类型失败",
-			"err":     err.Error(),
+			"err":     err,
 		})
 		return
 	}
@@ -31,7 +31,7 @@ func GetVolumesHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取卷列表失败",
-			"err":     err.Error(),
+			"err":     err,
 		})
 		return
 	}
@@ -57,19 +57,19 @@ func CheckVolumeTypeHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "获取卷类型失败",
-			"err":     err.Error(),
+			"err":     err,
 		})
 		return
 	}
 	for _, vt := range vts {
 		if vt.Name == query {
 			c.JSON(http.StatusOK, gin.H{
-				"message": "类型可用",
+				"message": "卷类型可用",
 			})
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "类型不可用",
+		"message": "卷类型不可用",
 	})
 
 }
