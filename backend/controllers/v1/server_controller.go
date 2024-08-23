@@ -34,7 +34,7 @@ func GetServersHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "查询主机成功",
-		"servers": svs,
+		"data":    svs,
 	})
 }
 
